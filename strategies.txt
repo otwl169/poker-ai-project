@@ -1,0 +1,89 @@
+File to describe the possible strategies in Kuhn Poker of each player.
+
+B = Bet/ Call, P = Check / Fold, O = No legal action
+
+B O
+P P 
+P B
+
+1                   2                   3
+B O                 ..
+P P                 ..
+P B                 ..
+
+P1 (R1, R2)         P2 (Check, Bet)
+
+PPP,BPP             BPB,BPP
+
+
+KQ  1  = Check / Check
+KJ  2 = Check / Bet / Call
+QK  -1 = Check / Bet / Fold
+QJ  -1  = Check / Bet / Fold
+JK  -1 = Check / Bet / Fold
+JQ  -1 = Check / Check
+
+
+PPP,BPP           BPP,BBP  
+
+
+
+# 
+
+first round, second round
+
+2/3: PPB,PBO             
+1/3: BPB,OPO
+
+1/3 betting a jack
+always check a queen
+always bet a K
+
+
+second round
+
+always fold a jack
+2/3 call with queen
+
+
+# 
+2/3: BPP,OBP
+1/3: BPB,OPO
+
+first round:
+always bet with king
+always check with queen
+1/3 to bet with jack
+
+second round:
+2/3 to call with queen
+always fold jack
+
+###
+
+1/3: BPB,BBP
+2/3: BPP,BPP
+
+P1 checks:
+always bet with king
+always check with queen
+1/3 bet with jack
+
+P1 bets:
+always call with king
+1/3 call with queen
+always fold with jack
+
+
+----------------
+[1.  1.  0. -0.  0.  0.  1.  1.  0.  1. -0.  0.  0.]
+
+= always bet king
+= always check / call queen
+= always bet jack
+
+[ 1.  0.  1.  0.  1.  1.  0. -0.  0.  0.  1.  1.  0.]
+
+= always check / fold king
+= always bet queen
+= always check / raise jack

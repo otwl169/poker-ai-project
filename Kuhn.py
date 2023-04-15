@@ -2,7 +2,8 @@
 from enum import IntEnum, Enum
 import random
 import numpy as np
-from Modelling.DBBR import Model
+from Modelling.DBBR import DBBR_Model
+from Modelling.Observed_Model import Model
 
 class Card(IntEnum):
     K = 3
@@ -50,8 +51,8 @@ class Kuhn:
         assert action2 in self.get_legal_moves([action1])
 
         # Record player 2 action in opponent model
-        self.player2_model.observe_action(action1.value, action2.value)
-        self.player1.M.observe_action(action1.value, action2.value)
+        self.player2_model.observe_action(action1.value, cards[1], action2.value)
+        # self.player1.M.observe_action(action1.value, action2.value)
         
         # If player 1 must make another action
         action3 = 0
@@ -68,7 +69,7 @@ class Kuhn:
         if action3 != 0: terminal_history.append(action3)
 
         # Update BEFFE / BEFEWP internals with terminal history and payoff
-        self.player1.update_internals(terminal_history, payoff)
+        # self.player1.update_internals(terminal_history, payoff)
         
         # Return (payoff, terminal_history)
         return (payoff, terminal_history)

@@ -25,7 +25,7 @@ from Kuhn import *
 # 1) BFS traversal of public history sets
 # 2) 
 
-class Model:
+class DBBR_Model:
     # Model for player 2 strategy
     def __init__(self):
         # Player 2 has 2 public history sets, with option of b (add money to pot)

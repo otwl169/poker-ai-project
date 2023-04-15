@@ -1,5 +1,5 @@
 from Kuhn import Kuhn, Card, Action
-from Modelling.DBBR import Model
+from Modelling.DBBR import DBBR_Model
 import random
 
 

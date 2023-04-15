@@ -1,6 +1,6 @@
 from Kuhn import Kuhn, Card, Action
 
-from Modelling.DBBR import Model
+from Modelling.DBBR import DBBR_Model
 from LinearProgram import *
 from Opponents.OptimalPlayer import OptimalPlayer
 from Opponents.StrategyPlayer import StrategyPlayer

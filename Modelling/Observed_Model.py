@@ -1,5 +1,4 @@
 # Modified DBBR that looks at observed information
-from Kuhn import *
 
 class Model:
     def __init__(self):
@@ -28,14 +27,10 @@ class Model:
         
         self.n_prior = 5
 
-    def observe_action(self, player1_action, card, action):
-        card_text = "J"
-        if card == card.K:
-            card_text = "K"
-        elif card == card.Q:
-            card_text = "Q"
 
-        self.frequencies[player1_action][card_text][action] += 1
+    def observe_action(self, p1_action, card, p2_action):
+        # Actions must be 'B' or 'P'. Card must be text form ie 'K'
+        self.frequencies[p1_action][card][p2_action] += 1
     
     def calculate_strategy(self):
         # uses n_prior fictitious hands played at equilibrium

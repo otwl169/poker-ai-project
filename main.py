@@ -24,6 +24,7 @@ test_s2 = {1: {'K': {'B': 0.4875, 'P': 0.5125}, 'Q': {'B': 0.0, 'P': 1.0}, 'J': 
 so_s = {1: {'K': {'B': 0.8, 'P': 0.2}, 'Q': {'B': 1/3 + 0.2, 'P': 2/3 - 0.2}, 'J': {'B': 0.2, 'P': 0.8}}, 2: {'K': {'B': 0.8, 'P': 0.2}, 'Q': {'B': 0.2, 'P': 0.8}, 'J': {'B': 1/3 + 0.2, 'P': 2/3 - 0.2}}}
 
 
+
 # Load pretrained MIVAT weights
 with open("Results/6D_eq_eq_mivat_theta", "rb") as f:
     theta = pickle.load(f)

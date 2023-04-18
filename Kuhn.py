@@ -27,7 +27,7 @@ class Kuhn:
                                [Card.Q, Card.J],
                                [Card.J, Card.K],
                                [Card.J, Card.Q]]
-        self.player2_model = Model()
+        self.card_text = {Card.K: 'K', Card.Q: 'Q', Card.J: 'J'}
 
     def deal_cards(self):
         # Uniformly deal cards to each player
@@ -49,13 +49,8 @@ class Kuhn:
         # Ensure action sets are legal
         assert action1 in self.get_legal_moves([])
         assert action2 in self.get_legal_moves([action1])
-
-        # Record player 2 action in opponent model
-        self.player2_model.observe_action(action1.value, cards[1], action2.value)
-        # self.player1.M.observe_action(action1.value, action2.value)
         
         # If player 1 must make another action
-        action3 = 0
         if self.get_legal_moves([action1, action2]):
             action3: Action = self.player1.play([action1, action2])
             history.append(action3)
@@ -71,7 +66,6 @@ class Kuhn:
         # Update BEFFE / BEFEWP internals with terminal history and payoff
         # self.player1.update_internals(terminal_history, payoff)
         
-        # Return (payoff, terminal_history)
         return (payoff, terminal_history)
     
     def get_legal_moves(self, history: list(Action)):
@@ -364,19 +358,6 @@ class Kuhn:
         M[0][0] = 1 # Dummy row
         for i, info in enumerate(infosets): 
             for j, seq in enumerate(sequences):          
-                # # Round 1 player 1
-                # if len(info) == 1 and len(seq) == 3:
-                #     # -1 for the card infoset
-                #     M[i+1][0] = -1 
-                #     # If the infoset card matches sequence card
-                #     if info[0] == seq[0]:
-                #         M[i][j] = 1
-                
-                # # Round 2 player 1
-                # elif len(info) == 3:
-                #     # -1 for the action required for the infoset
-                #     if info[:2] == seq:
-                #         M[i+1]
                 if len(info) == player:
                     # Card only infoset adds -1 to dummy column
                     M[i+1][0] = -1

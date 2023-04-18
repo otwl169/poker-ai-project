@@ -82,6 +82,9 @@ class Solver:
         self.F = self.g.get_sequences_legal_matrix(2)
         self.f = np.zeros(7)
         self.f[0] = 1
+
+        # Value of the game (to player 1)
+        self.v = -1/18
     
     def get_player1_equilibrium(self):
         x = cp.Variable(13)
@@ -121,6 +124,22 @@ class Solver:
 
         problem = cp.Problem(objective, constraints)
         problem.solve()
+
+        return np.round(x.value, 3)
+    
+    def get_player1_epsilon_best_response(self, strategy, epsilon=0):
+        y = self.transform_strategy_to_vector(strategy, 2)
+        x = cp.Variable(13)
+        q = cp.Variable(7)
+
+        objective = cp.Maximize(x.T @ self.P @ y)
+        constraints = [x.T @ self.E.T == self.e.T]
+        constraints.append(x.T @ self.P >= -(q @ self.F))
+        constraints.append(q[0] == epsilon - self.v)
+        constraints.append(x >= 0)
+
+        problem = cp.Problem(objective, constraints)
+        problem.solve(verbose=True)
 
         return np.round(x.value, 3)
 
@@ -211,17 +230,27 @@ if __name__ == "__main__":
     s = Solver()
 
     # x = s.get_player1_equilibrium()
-    # y = s.get_player2_equilibrium()
+    y = s.get_player2_equilibrium()
 
     # p1_eq = s.transform_vector_to_strategy(x, 1)
     # print(p1_eq)
     # p1_vec = s.transform_strategy_to_vector(p1_eq, 1)
     # print(p1_vec)
     # print(y)
-    # p2_eq = s.transform_vector_to_strategy(y, 2)
+    p2_eq = s.transform_vector_to_strategy(y, 2)
     # print(p2_eq)
     # p2_vec = s.transform_strategy_to_vector(p2_eq, 2)
     # print(p2_vec)
 
     # print(s.get_player1_exploitability(p1_eq))
+    random_s = {'B': {'K': {'B': 0.5, 'P': 0.5},
+                  'Q': {'B': 0.5, 'P': 0.5},
+                  'J': {'B': 0.5, 'P': 0.5}},
+            'P': {'K': {'B': 0.5, 'P': 0.5},
+                  'Q': {'B': 0.5, 'P': 0.5},
+                  'J': {'B': 0.5, 'P': 0.5}}}
+
+    p1_eq = s.get_player1_epsilon_best_response(random_s, 0)
+    print(s.transform_vector_to_strategy(p1_eq))
+
     

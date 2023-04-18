@@ -292,3 +292,135 @@ class Kuhn:
                         M[i+1][j+1] = self.get_history_outcome(a2[1:], [a1[0], a2[0]])
 
         return M
+    
+    def get_strategy_sequences(self, player=1):
+        # Get the sequence form strategies for each player
+        sequences = []
+
+        # Player 1 sequences are labelled a through l
+        if player == 1:
+            # Player 1 has 6 infosets - ordered by (ROUND, CARD ascending)
+            sequences = [[Card.J, Action.Check],
+                         [Card.J, Action.Bet],
+                         [Card.Q, Action.Check],
+                         [Card.Q, Action.Bet],
+                         [Card.K, Action.Check],
+                         [Card.K, Action.Bet],
+
+                         [Card.J, Action.Check, Action.Bet, Action.Fold],
+                         [Card.J, Action.Check, Action.Bet, Action.Call],
+                         [Card.Q, Action.Check, Action.Bet, Action.Fold],
+                         [Card.Q, Action.Check, Action.Bet, Action.Call],
+                         [Card.K, Action.Check, Action.Bet, Action.Fold],
+                         [Card.K, Action.Check, Action.Bet, Action.Call]]
+
+        # Player 2 sequences are labelled m through x
+        else:
+            # Player 2 has 6 infosets - ordered by (CARD Q, CARD K, CARD J, Pass infoset, Bet infoset)
+            sequences = [[Card.Q, Action.Check, Action.Check],
+                         [Card.Q, Action.Check, Action.Bet],
+                         [Card.Q, Action.Bet, Action.Fold],
+                         [Card.Q, Action.Bet, Action.Call],
+
+                         [Card.K, Action.Check, Action.Check],
+                         [Card.K, Action.Check, Action.Bet],
+                         [Card.K, Action.Bet, Action.Fold],
+                         [Card.K, Action.Bet, Action.Call],
+
+                         [Card.J, Action.Check, Action.Check],
+                         [Card.J, Action.Check, Action.Bet],
+                         [Card.J, Action.Bet, Action.Fold],
+                         [Card.J, Action.Bet, Action.Call]]
+        
+        return sequences
+    
+    def get_sequences_legal_matrix(self, player=1):
+        assert player == 1 or player == 2
+
+        if player == 1:
+            # Ordered by (ROUND, CARD ascending)
+            infosets = [[Card.J],
+                        [Card.Q],
+                        [Card.K],
+                        [Card.J, Action.Check, Action.Bet],
+                        [Card.Q, Action.Check, Action.Bet],
+                        [Card.K, Action.Check, Action.Bet]]
+            
+            sequences = self.get_strategy_sequences(1)
+        
+        if player == 2:
+            # Ordered by ...
+            infosets = [[Card.Q, Action.Check],
+                        [Card.Q, Action.Bet],
+                        [Card.K, Action.Check],
+                        [Card.K, Action.Bet],
+                        [Card.J, Action.Check],
+                        [Card.J, Action.Bet]]
+            
+            sequences = self.get_strategy_sequences(2)
+        
+
+        M = np.zeros((7,13))
+        M[0][0] = 1 # Dummy row
+        for i, info in enumerate(infosets): 
+            for j, seq in enumerate(sequences):          
+                # # Round 1 player 1
+                # if len(info) == 1 and len(seq) == 3:
+                #     # -1 for the card infoset
+                #     M[i+1][0] = -1 
+                #     # If the infoset card matches sequence card
+                #     if info[0] == seq[0]:
+                #         M[i][j] = 1
+                
+                # # Round 2 player 1
+                # elif len(info) == 3:
+                #     # -1 for the action required for the infoset
+                #     if info[:2] == seq:
+                #         M[i+1]
+                if len(info) == player:
+                    # Card only infoset adds -1 to dummy column
+                    M[i+1][0] = -1
+                
+                if seq == info[:-1]:
+                    # Strategy contained in history of infoset -> must have been played
+                    M[i+1][j+1] = -1
+                elif seq[:-1] == info:
+                    # Strategy == Infoset + action
+                    M[i+1][j+1] = 1
+            
+        return M
+        
+    
+    def get_sequence_payoff_matrix(self):
+        # Get each player's sequences
+        p1_sequences = self.get_strategy_sequences(1)
+        p2_sequences = self.get_strategy_sequences(2)
+
+        # Sparse matrix M, with payoffs wherever these actions form a legal terminal history
+        M = np.zeros((13, 13))
+
+        for i, s1 in enumerate(p1_sequences):
+            for j, s2 in enumerate(p2_sequences):
+                # Make sure that they don't have the same card
+                if s1[0] == s2[0]:
+                    pass
+                elif len(s1) == 2:
+                    # Round 1
+                    # Ensure that histories agree
+                    if s1[1] == s2[1]:
+                        # Evaluation of Check + Bet or any other non terminal history will return 0 from history outcome
+                        M[i+1][j+1] = self.get_history_outcome(s2[1:], [s1[0], s2[0]])
+                
+                elif len(s1) == 4:
+                    # Round 2
+                    # Ensure that histories agree
+                    if s1[1:-1] == s2[1:] == [Action.Check, Action.Bet]:
+                        M[i+1][j+1] = self.get_history_outcome(s1[1:], [s1[0], s2[0]])
+        
+        return M / 6
+
+
+if __name__ == "__main__":
+    g = Kuhn(0, 0)
+    print(g.get_strategy_sequences(1))
+    # print(g.get_strategy_sequences(2))

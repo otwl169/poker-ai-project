@@ -125,7 +125,9 @@ class Solver:
         problem = cp.Problem(objective, constraints)
         problem.solve()
 
-        return np.round(x.value, 3)
+        # Round the strategy sequence and output it as a behavioural dictionary
+        br = self.transform_vector_to_strategy(np.round(x.value, 5), 1)
+        return br
     
     def get_player1_epsilon_best_response(self, strategy, epsilon=0):
         y = self.transform_strategy_to_vector(strategy, 2)
@@ -139,9 +141,29 @@ class Solver:
         constraints.append(x >= 0)
 
         problem = cp.Problem(objective, constraints)
-        problem.solve(verbose=True)
+        problem.solve()
 
-        return np.round(x.value, 3)
+        # Round the strategy sequence and output it as a behavioural dictionary
+        br = self.transform_vector_to_strategy(np.round(x.value, 5), 1)
+        return br
+    
+    def get_player1_best_response_and_exploitability(self, strategy):
+        y = self.transform_strategy_to_vector(strategy, 2)
+        x = cp.Variable(13)
+        q = cp.Variable(7)
+
+        objective = cp.Maximize(x.T @ self.P @ y)
+        constraints = [x.T @ self.E.T == self.e.T]
+        constraints.append(x.T @ self.P >= -(q @ self.F))
+        constraints.append(x >= 0)
+
+        problem = cp.Problem(objective, constraints)
+        problem.solve()
+
+        # Round the strategy sequence and output it as a behavioural dictionary
+        br = self.transform_vector_to_strategy(np.round(x.value, 5), 1)
+        expl = np.round(q.value[0] + self.v, 3)
+        return br, expl
 
     def get_player1_exploitability(self, strategy):
         # Get exploitability by computing the expected value of a nemesis strategy
@@ -156,6 +178,21 @@ class Solver:
         problem.solve()
 
         return problem.value
+    
+    def get_player2_best_response(self, strategy):
+        x = self.transform_strategy_to_vector(strategy, 2)
+        y = cp.Variable(13)
+
+        objective = cp.Minimize(x @ self.P @ y)
+        constraints = [-self.F @ y == -self.f]
+        constraints.append(y >= 0)
+
+        problem = cp.Problem(objective, constraints)
+        problem.solve()
+
+        # Round the strategy sequence and output it as a behavioural dictionary
+        br = self.transform_vector_to_strategy(np.round(x.value, 5), 2)
+        return br 
 
     def transform_vector_to_strategy(self, vector, player=1):
         # Transform vector output into behavioural strategy
@@ -210,7 +247,7 @@ class Solver:
                     vector[(2*i)+7] = strategy[2][card]['P'] * strategy[1][card]['P']
                     vector[(2*i)+8] = strategy[2][card]['B'] * strategy[1][card]['P']
 
-            assert np.allclose(vector.T @ self.E.T, self.e.T)
+            assert np.allclose(vector.T @ self.E.T, self.e.T, atol=1e-03)
     
         elif player == 2:
             for i, card in enumerate(['Q', 'K', 'J']):
@@ -220,7 +257,7 @@ class Solver:
                 vector[(4*i)+3] = strategy['B'][card]['P']
                 vector[(4*i)+4] = strategy['B'][card]['B']
 
-            assert np.allclose(-self.F @ vector, -self.f)
+            assert np.allclose(-self.F @ vector, -self.f, atol=1e-03)
     
         return vector
             
@@ -230,14 +267,14 @@ if __name__ == "__main__":
     s = Solver()
 
     # x = s.get_player1_equilibrium()
-    y = s.get_player2_equilibrium()
+    # y = s.get_player2_equilibrium()
 
     # p1_eq = s.transform_vector_to_strategy(x, 1)
     # print(p1_eq)
     # p1_vec = s.transform_strategy_to_vector(p1_eq, 1)
     # print(p1_vec)
     # print(y)
-    p2_eq = s.transform_vector_to_strategy(y, 2)
+    # p2_eq = s.transform_vector_to_strategy(y, 2)
     # print(p2_eq)
     # p2_vec = s.transform_strategy_to_vector(p2_eq, 2)
     # print(p2_vec)
@@ -250,7 +287,15 @@ if __name__ == "__main__":
                   'Q': {'B': 0.5, 'P': 0.5},
                   'J': {'B': 0.5, 'P': 0.5}}}
 
-    p1_eq = s.get_player1_epsilon_best_response(random_s, 0)
-    print(s.transform_vector_to_strategy(p1_eq))
+    br, expl  = s.get_player1_best_response_and_exploitability(random_s)
+    print(br, expl)
+    print(s.get_player1_exploitability(br))
 
-    
+
+    x = np.array([1, 1, 0, 0.44901, 0.55099, 0, 1, 1, 0, 0.2245, 0.2245, 0, 0,])
+    l = x.T @ s.E.T
+    print(l)
+
+
+    print(np.allclose(l, s.e.T))
+    print(np.allclose(l, s.e.T, atol=1e-03))

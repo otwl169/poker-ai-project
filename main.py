@@ -4,6 +4,7 @@ from Kuhn import *
 from Opponents.RandomPlayer import RandomPlayer
 from Opponents.OptimalPlayer import OptimalPlayer
 from Opponents.StrategyPlayer import StrategyPlayer
+from Opponents.SophisticatedPlayer import SophisticatedPlayer
 from Algorithms.BEFFE import BEFFE_Player
 from Algorithms.BEFEWP import BEFEWP_Player
 from Algorithms.BEFFE_MIVAT import BEFFE_MIVAT_Player
@@ -14,6 +15,8 @@ from MIVAT.MIVAT import MIVAT
 from LinearProgram import *
 
 import pickle
+
+import time
 
 # Set random seed here, and verify that it causes all cards dealt to be the same on each playthrough
 
@@ -31,16 +34,19 @@ with open("Results/6D_eq_eq_mivat_theta", "rb") as f:
 
 est = MIVAT(theta)
 
-number_of_hands = 1000000
-g = Kuhn(StrategyPlayer(test_s), OptimalPlayer())
+number_of_hands = 1_000
+g = Kuhn(BEFFE_Player(number_of_hands), SophisticatedPlayer())
 # g = Kuhn(OptimalPlayer(), OptimalPlayer())
+t1 = time.time()
 for i in range(number_of_hands):
     # Different values of alpha are optimal against random classes of player (non-exploitative)
     (payoff, terminal_history) = g.play_round()
     # est.observe_trial(payoff, terminal_history)
 
+t2 = time.time()
 print(f"Winrate in $/hand of player 1: {(g.player1_value) / number_of_hands}")
 # print(f"Player 2 computed strategy: {g.player2_model.calculate_strategy()}")
-print(f"Estimated winrate using MIVAT: {est.get_average_estimate()}")
+# print(f"Estimated winrate using MIVAT: {est.get_average_estimate()}")
 print("Value of the game for player 1: ", -1/18)
+print(f"Ran in {t2 - t1} seconds")
 

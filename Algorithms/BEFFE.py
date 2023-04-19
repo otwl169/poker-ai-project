@@ -29,11 +29,22 @@ class BEFFE_Player:
         self.T = T
         self.t = 0
 
-        # Strategy at time step t
+        # Strategy at time step t, type of strategy at time step t
         self.strategy = 0
+        self.exploit = False
+        
+        # Computed best reponse and best response exploitability
+        self.best_response = 0
+        self.exploitability = 0
+
+        # Computed best equilibrium strategie
+        self.best_equilibrium = 0
 
         # Translate cards to strings
         self.card_text = {Card.K: "K", Card.Q: "Q", Card.J: "J"}
+
+        # How many rounds to play before calculating strategies
+        self.interval = 50
     
     def give_card(self, card: Card):
         self.card = card
@@ -57,15 +68,21 @@ class BEFFE_Player:
             return 0
     
     def update_internals(self, terminal_history: list(), payoff):
-        ### Update the opponent model and gift strategy value k
+        ### Update the opponent model, gift strategy value k and t
 
         # Update opponent model with terminal history 
         # [P1 card, P1 action, P2 card, P2 action, P1 action]
-        self.M.observe_action(terminal_history[1], terminal_history[2], terminal_history[3])
+        p1_action = terminal_history[1].value
+        p2_card = self.card_text[terminal_history[2]]
+        p2_action = terminal_history[3].value
+        self.M.observe_action(p1_action, p2_card, p2_action)
 
         # Update gift strategy value k. If opponent plays a gift strategy we can gain value
-        next_k = self.s.get_player1_exploitability(self.strategy) - self.v
-        next_k += self.detect_gift_strategy(terminal_history, payoff)
+        current_exploitability = 0 if not self.exploit else self.exploitability
+        self.k += current_exploitability + self.detect_gift_strategy(terminal_history, payoff) - self.v
+
+        # Update t
+        self.t += 1
     
     def play_strategy(self, history: list(Action)):
         ### Play according to a behavioural strategy
@@ -82,15 +99,22 @@ class BEFFE_Player:
         ### Play a round of betting according to BEFFE algorithm
 
         # Calculate opponent model, best response and exploitability of best response
-        opponent_strategy = self.M.calculate_strategy()
-        best_response = self.s.get_player1_best_response(opponent_strategy)
-        exploitability = self.v - self.s.get_player1_exploitability(best_response)
+        # Only if t is a multiple of self.interval (every self.interval rounds)
+        if history == []:
+            # Only update the strategy at the start of the turn
+            if self.t % self.interval == 0:
+                opponent_strategy = self.M.calculate_strategy()
+                self.best_response = self.s.get_player1_best_response(opponent_strategy)
+                self.exploitability = self.v - self.s.get_player1_exploitability(self.best_response)
+                self.best_equilibrium = self.s.get_player1_epsilon_best_response(opponent_strategy, 0)
 
-        # Since we take n_prior equilibrium hands, need to be careful of immediate attempt to exploit
-        if self.k >= (self.T - self.t + 1)(self.v - exploitability):
-            self.strategy = best_response
-        else:
-            # Pick best equilibrium strategy
-            self.strategy = self.s.get_player1_epsilon_best_response(opponent_strategy, 0)
+            # If nemesis wouldn't expect to take all of our value in remaining turns, attempt to exploit
+            if self.k >= (self.T - self.t + 1) * self.exploitability:
+                self.strategy = self.best_response
+                self.exploit = True
+            else:
+                # Pick best equilibrium strategy
+                self.strategy = self.best_equilibrium
+                self.exploit = False
         
         return self.play_strategy(history)

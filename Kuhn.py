@@ -28,6 +28,8 @@ class Kuhn:
                                [Card.J, Card.K],
                                [Card.J, Card.Q]]
         self.card_text = {Card.K: 'K', Card.Q: 'Q', Card.J: 'J'}
+        self.t = 0
+        # random.seed(10)
 
     def deal_cards(self):
         # Uniformly deal cards to each player
@@ -39,7 +41,11 @@ class Kuhn:
 
     def play_round(self):
         # Play one round of Kuhn poker
+        self.t += 1
         cards = self.deal_cards()
+
+        # Specifically for dynamic opponent, give player 1 exact strategy
+        # self.player2.give_strategy(self.player1.strategy)
     
         # Get actions of both players
         action1: Action = self.player1.play([])
@@ -51,6 +57,7 @@ class Kuhn:
         assert action2 in self.get_legal_moves([action1])
         
         # If player 1 must make another action
+        action3 = 0
         if self.get_legal_moves([action1, action2]):
             action3: Action = self.player1.play([action1, action2])
             history.append(action3)
@@ -64,7 +71,7 @@ class Kuhn:
         if action3 != 0: terminal_history.append(action3)
 
         # Update BEFFE / BEFEWP internals with terminal history and payoff
-        # self.player1.update_internals(terminal_history, payoff)
+        self.player1.update_internals(terminal_history, payoff)
         
         return (payoff, terminal_history)
     

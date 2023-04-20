@@ -22,6 +22,9 @@ class OptimalPlayer:
     
     def give_card(self, card: Card):
         self.card = card
+    
+    def update_internals(self, terminal_history: list(), payoff):
+        pass
 
     def play(self, history: list(Action)):
         assert len(history) <= 2

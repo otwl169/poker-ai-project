@@ -3,8 +3,8 @@ import os.path
 from itertools import islice
 
 
-RESULTS_FILE = "Results/BEFFE_sophisticated_10k"
-NUM_LINES = 10_000
+RESULTS_FILE = "Results/best_equilibrium_sophisticated_20k"
+NUM_LINES = 20_000
 
 assert os.path.exists(RESULTS_FILE)
 

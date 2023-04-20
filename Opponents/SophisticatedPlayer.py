@@ -16,11 +16,22 @@ class SophisticatedPlayer:
                          'P': {'K': {'B': 1, 'P': 0}, 
                                'Q': {'B': 0, 'P': 1}, 
                                'J': {'B': 1/3, 'P': 2/3}}}
-        self.offset = 0.2
+
+        # Set strategy to within 0.2 of equilibrium, decided by a uniform distribution
+        self.modify_strategy()
+
+        # Card text map
         self.card_text = {Card.K: 'K', Card.Q: 'Q', Card.J: 'J'}
     
     def give_card(self, card: Card):
         self.card = card
+    
+    def modify_strategy(self):
+        # Generate strategy which is uniformly random within 0.2 of the equilibrium strategy
+        for ph_set in self.strategy:
+            for infoset in self.strategy[ph_set]:
+                deviation = (random.random() - 0.5) / (0.5/0.2)
+                self.strategy[ph_set][infoset]['B'] += deviation
     
     def play(self, history: list(Action)):
         # Deviation from equilibrium strategy is within [-0.2. 0.2]

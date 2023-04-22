@@ -180,7 +180,7 @@ class Solver:
         return problem.value
     
     def get_player2_best_response(self, strategy):
-        x = self.transform_strategy_to_vector(strategy, 2)
+        x = self.transform_strategy_to_vector(strategy, 1)
         y = cp.Variable(13)
 
         objective = cp.Minimize(x @ self.P @ y)
@@ -191,7 +191,7 @@ class Solver:
         problem.solve()
 
         # Round the strategy sequence and output it as a behavioural dictionary
-        br = self.transform_vector_to_strategy(np.round(x.value, 5), 2)
+        br = self.transform_vector_to_strategy(np.round(y.value, 5), 2)
         return br 
 
     def transform_vector_to_strategy(self, vector, player=1):

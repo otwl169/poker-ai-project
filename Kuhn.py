@@ -44,8 +44,8 @@ class Kuhn:
         self.t += 1
         cards = self.deal_cards()
 
-        # Specifically for dynamic opponent, give player 1 exact strategy
-        # self.player2.give_strategy(self.player1.strategy)
+        # Specifically for dynamic opponent, give player 1 exact strategy used in round
+        # self.player2.give_strategy(self.player1.strategy) 
     
         # Get actions of both players
         action1: Action = self.player1.play([])

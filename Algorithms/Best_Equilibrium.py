@@ -28,7 +28,7 @@ class BE_player:
         self.card_text = {Card.K: "K", Card.Q: "Q", Card.J: "J"}
 
         # How many rounds to play before calculating strategies
-        self.interval = 50
+        self.interval = 25
     
     def give_card(self, card: Card):
         self.card = card

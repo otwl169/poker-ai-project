@@ -3,12 +3,13 @@ import os.path
 from itertools import islice
 
 
-RESULTS_FILE = "Results/best_equilibrium_sophisticated_20k"
-NUM_LINES = 20_000
+RESULTS_FILE = "Results/BEFFE_dynamic_10k"
+NUM_LINES = 10_000
 
 assert os.path.exists(RESULTS_FILE)
 
 with open(RESULTS_FILE, "r") as fh:
+    print(RESULTS_FILE)
     lines = islice(fh, NUM_LINES)
 
     # Compute average

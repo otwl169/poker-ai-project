@@ -7,7 +7,7 @@ from Opponents.StrategyPlayer import StrategyPlayer
 from Opponents.SophisticatedPlayer import SophisticatedPlayer
 from Algorithms.BEFFE import BEFFE_Player
 from Algorithms.BEFEWP import BEFEWP_Player
-from Algorithms.BEFFE_MIVAT import BEFFE_MIVAT_Player
+from Algorithms.MBEFFE import BEFFE_MIVAT_Player
 from Algorithms.BEFEWP_MIVAT import BEFEWP_MIVAT_Player
 from Algorithms.GREEDY_MIVAT import GREEDY_MIVAT_Player
 

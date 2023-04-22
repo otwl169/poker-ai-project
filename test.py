@@ -36,8 +36,10 @@ t1 = time.time()
 with open(RESULTS_FILE, "a") as fh:
     buffer = []
     for i in range(number_of_tests):
-        # Play against opponent for 1000 hands
+        # Set the random seed to ensure same opponent strategies and card deals
+        random.seed(i)
 
+        # Play 1000 hands against opponent
         g = Kuhn(MBEFFE_Player(1000, estimator), RandomPlayer())
         for _ in range(number_of_hands):
             (payoff, terminal_history) = g.play_round()

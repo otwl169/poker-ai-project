@@ -34,8 +34,17 @@ class DynamicPlayer:
         # Interval to calculate best response
         self.interval = 50
 
+        self.modify_strategy()
+
     def give_card(self, card: Card):
         self.card = card
+
+    def modify_strategy(self):
+        # Choose strategy at each information set uniformly at random
+        for ph_set in self.random_strategy:
+            for infoset in self.random_strategy[ph_set]:
+                bet_chance = random.random()
+                self.random_strategy[ph_set][infoset]['B'] = bet_chance
 
     def play_strategy(self, history: list(Action)):
         if history[0] == Action.Bet:

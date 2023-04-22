@@ -30,7 +30,16 @@ class SophisticatedPlayer:
         # Generate strategy which is uniformly random within 0.2 of the equilibrium strategy
         for ph_set in self.strategy:
             for infoset in self.strategy[ph_set]:
-                deviation = (random.random() - 0.5) / (0.5/0.2)
+                if self.strategy[ph_set][infoset]['B'] == 1:
+                    # Deviation between [-0.2, 0]
+                    deviation = (random.random() - 1) / 5
+                elif self.strategy[ph_set][infoset]['B'] == 0:
+                    # Deviation between [0, 0.2]
+                    deviation = (random.random()) / 5
+                else:
+                    # Deviation between [-0.2, 0.2]
+                    deviation = (random.random() - 0.5) / (0.5/0.2)
+
                 self.strategy[ph_set][infoset]['B'] += deviation
     
     def play(self, history: list(Action)):

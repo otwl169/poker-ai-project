@@ -48,11 +48,15 @@ class MBEFFE_Player:
 
         # MIVAT estimator utilities
         self.est = estimator
+        self.G_n = 0 # Previous number of gifts received
         self.G_t = 0 # Previous gift value
         self.G = 0 # Current gift value
+        self.Gn = 0 # Current number of gifts received
         self.EST_t = 0 # Previous interval estimate
         self.EST = 0 # Current interval estimate
         self.alpha = 5
+
+        self.TG = 0
 
     
     def give_card(self, card: Card):
@@ -60,19 +64,21 @@ class MBEFFE_Player:
     
     def detect_gift_strategy(self, terminal_history: list(), payoff):
         # The gift strategies for player 2 in Kuhn poker are:
-
+        # print(terminal_history)
         if terminal_history[1:4] == [Action.Bet, Card.J, Action.Call]:
-            # Calling a bet with a J
-            return payoff
+            # Calling a bet with a J has EV to player 1 of 1/3 (4/6-1/6)
+            return self.strategy[1]['K']['B']/6 + self.strategy[1]['Q']['B']/6
         elif terminal_history[1:4] == [Action.Bet, Card.K, Action.Fold]:
-            # Folding to a bet with a K
-            return payoff
+            # Folding to a bet with a K has EV to player 1 of 1/3 WOULD HAVE (-4/6) BUT HAVE (2/6)
+            return self.strategy[1]['Q']['B']*(3/6) + self.strategy[1]['J']['B']*(3/6)
         elif terminal_history[1:4] == [Action.Check, Card.K, Action.Check]:
-            # Checking a K if player 1 checks
-            return payoff
+            # Checking a K if player 1 checks has EV to player 1 of 1/6?????
+            q_val = (1-self.strategy[1]['Q']['B'])*self.strategy[2]['Q']['B']/6
+            j_val = (1-self.strategy[1]['J']['B'])*self.strategy[2]['J']['B']/6
+            return q_val + j_val
         elif terminal_history[1:4] == [Action.Check, Card.Q, Action.Bet]:
-            # Betting a Q if player 1 checks
-            return payoff
+            # Betting a Q if player 1 checks has EV 1/6 * 0 + 1/6 * 1 # 0 - (1-2)
+            return (1-self.strategy[1]['K']['B'])/6
         else:
             return 0
     
@@ -87,13 +93,16 @@ class MBEFFE_Player:
         self.M.observe_action(p1_action, p2_card, p2_action)
 
         # Update gift strategy value k. If opponent plays a gift strategy we can gain value
-        current_exploitability = 0 if not self.exploit else self.exploitability
+        current_nemesis_ev = self.v if not self.exploit else self.v - self.exploitability
         gift_value = self.detect_gift_strategy(terminal_history, payoff)
-        self.k += current_exploitability + gift_value - self.v
+        self.k += current_nemesis_ev + gift_value - self.v
 
         # MIVAT incorporation into gift strategy value, weighted by the gift value received in the previous interval
         self.EST += self.est.pred(payoff, terminal_history)
         self.G += gift_value
+        if gift_value != 0:
+            self.Gn += 1
+            self.TG += 1
 
         # MIVAT_term = (self.G_t * self.alpha) / ((self.interval * self.exploitability) + 1)
         # self.MIVAT_term *= max(0, (self.EST_t - self.v))
@@ -103,8 +112,12 @@ class MBEFFE_Player:
         if self.t % self.interval == 0:
             self.EST_t = self.EST / self.interval
             self.G_t = self.G
+            self.G_n = self.Gn
             self.EST = 0
             self.G = 0
+            self.Gn = 0
+
+            # print(f"Interval {self.t // self.interval}, {self.G_n=}, {self.G_t=}, MIVAT est: {self.EST_t - self.v}, {self.TG=} MIVAT term: {self.G_n * max(0, (self.EST_t - self.v)) * (self.t / (self.t+2 - self.TG))}, {self.exploitability=}")
 
         # Update t
         self.t += 1
@@ -132,14 +145,22 @@ class MBEFFE_Player:
                 self.best_response = self.s.get_player1_best_response(opponent_strategy)
                 self.exploitability = self.v - self.s.get_player1_exploitability(self.best_response)
                 self.best_equilibrium = self.s.get_player1_epsilon_best_response(opponent_strategy, 0)
+                # if self.t == 50: print(self.best_equilibrium)
 
 
-            MIVAT_term = (self.G_t * self.alpha) / ((self.interval * self.exploitability) + 1)
-            MIVAT_term *= max(0, (self.EST_t - self.v))
+            # MIVAT_term = (self.G_t * self.alpha) / ((self.interval * self.exploitability) + 1)
+            # MIVAT_term *= max(0, (self.EST_t - self.v))
+            MIVAT_term = self.G_n * max(0, (self.EST_t - self.v)) * (self.t / (self.t - self.TG + 1))
+            # print(MIVAT_term)
             # If nemesis wouldn't expect to take all of our value in remaining turns, attempt to exploit
             if self.k + MIVAT_term >= (self.T - self.t + 1) * self.exploitability:
+                # print(f"Exploiting at {self.t=}")
                 self.strategy = self.best_response
                 self.exploit = True
+
+                if self.k < (self.T - self.t + 1) * self.exploitability:
+                    # MIVAT exploit refund
+                    self.k += self.exploitability
             else:
                 # Pick best equilibrium strategy
                 self.strategy = self.best_equilibrium

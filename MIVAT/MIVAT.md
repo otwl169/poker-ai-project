@@ -50,7 +50,7 @@
 
  - Define a function to map histories to a vector of d features:
     - In Kuhn poker, we have 1: Card strength. 2: Pot equity. 3: Pot value
- - Train on a series of examples:
+ - Train on a series of examples:   
     - Calculate At for each example. Store payout at each example
     - Directly solve for theta j using matrices of these samples
     - Use theta j in estimator
@@ -72,6 +72,9 @@ Sample 50:  95% Confidence Interval: ± 0.246
 Sample 100: 95% Confidence Interval: ± 0.174
 Sample 500: 95% Confidence Interval: ± 0.0779
 Sample 1000: 95% Confidence Interval: ± 0.0551
+
+90% CI = 0.0462
+
 Sample 5000: 95% Confidence Interval: ± 0.0246
 Sample 10000: 95% Confidence Interval: ± 0.0174
 Sample 100000: 95% Confidence Interval: ± 0.00551

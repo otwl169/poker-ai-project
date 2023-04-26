@@ -280,22 +280,22 @@ if __name__ == "__main__":
     # print(p2_vec)
 
     # print(s.get_player1_exploitability(p1_eq))
-    random_s = {'B': {'K': {'B': 0.5, 'P': 0.5},
+    random_s = {1: {'K': {'B': 0.5, 'P': 0.5},
                   'Q': {'B': 0.5, 'P': 0.5},
                   'J': {'B': 0.5, 'P': 0.5}},
-            'P': {'K': {'B': 0.5, 'P': 0.5},
+            2: {'K': {'B': 0.5, 'P': 0.5},
                   'Q': {'B': 0.5, 'P': 0.5},
                   'J': {'B': 0.5, 'P': 0.5}}}
 
-    br, expl  = s.get_player1_best_response_and_exploitability(random_s)
-    print(br, expl)
-    print(s.get_player1_exploitability(br))
+    # br, expl  = s.get_player1_best_response_and_exploitability(random_s)
+    # print(br, expl)
+    print(s.get_player1_exploitability(random_s))
 
 
-    x = np.array([1, 1, 0, 0.44901, 0.55099, 0, 1, 1, 0, 0.2245, 0.2245, 0, 0,])
-    l = x.T @ s.E.T
-    print(l)
+    # x = np.array([1, 1, 0, 0.44901, 0.55099, 0, 1, 1, 0, 0.2245, 0.2245, 0, 0,])
+    # l = x.T @ s.E.T
+    # print(l)
 
 
-    print(np.allclose(l, s.e.T))
-    print(np.allclose(l, s.e.T, atol=1e-03))
+    # print(np.allclose(l, s.e.T))
+    # print(np.allclose(l, s.e.T, atol=1e-03))

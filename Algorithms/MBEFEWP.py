@@ -1,15 +1,15 @@
-from Kuhn import Kuhn, Card, Action
+### MIVAT estimator incorporated into the BEFEWP algorithm
+
+from Kuhn import Card, Action
 
 from Modelling.Observed_Model import Model
 from LinearProgram import Solver
-from Opponents.OptimalPlayer import OptimalPlayer
-from Opponents.StrategyPlayer import StrategyPlayer
 
 import random
 
-class BEFFE_Player:
+class MBEFEWP_Player:
 
-    def __init__(self, T):
+    def __init__(self, T, estimator):
         # Value of the game to player i
         self.v = -1/18
 
@@ -45,6 +45,21 @@ class BEFFE_Player:
 
         # How many rounds to play before calculating strategies
         self.interval = 50
+
+        # MIVAT estimator utilities
+        self.est = estimator
+        self.G_t = 0 # Previous gift value
+        self.G_n = 0 # Previous number of gifts
+        self.G = 0 # Current gift value
+        self.Gn = 0 # Current number of gifts
+        self.EST_t = 0 # Previous interval estimate
+        self.EST = 0 # Current interval estimate
+        self.alpha = 5
+
+        self.TG = 0
+
+        self.num_mivat_exploits = 0
+
     
     def give_card(self, card: Card):
         self.card = card
@@ -81,7 +96,32 @@ class BEFFE_Player:
 
         # Update gift strategy value k. If opponent plays a gift strategy we can gain value
         current_nemesis_ev = self.v if not self.exploit else self.v - self.exploitability
-        self.k += current_nemesis_ev + self.detect_gift_strategy(terminal_history, payoff) - self.v
+        gift_value = self.detect_gift_strategy(terminal_history, payoff)
+        self.k += current_nemesis_ev + gift_value - self.v
+
+        if gift_value > 0:
+            self.Gn += 1
+            self.G += gift_value
+            self.TG += 1
+
+        # MIVAT incorporation into gift strategy value, weighted by the gift value received in the previous interval
+        self.EST += self.est.pred(payoff, terminal_history)
+        self.G += gift_value
+
+        # MIVAT_term = (self.G_t * self.alpha) / ((self.interval * self.exploitability) + 1)
+        # self.MIVAT_term *= max(0, (self.EST_t - self.v))
+
+        # self.k += self.MIVAT_term
+
+        if self.t % self.interval == 0:
+            self.EST_t = self.EST / self.interval
+            self.EST = 0
+
+            self.G_t = self.G
+            self.G_n = self.Gn
+            
+            self.G = 0
+            self.Gn = 0
 
         # Update t
         self.t += 1
@@ -110,10 +150,19 @@ class BEFFE_Player:
                 self.exploitability = self.v - self.s.get_player1_exploitability(self.best_response)
                 self.best_equilibrium = self.s.get_player1_epsilon_best_response(opponent_strategy, 0)
 
+
+            # MIVAT_term = (self.G_t * self.alpha) / ((self.interval * self.exploitability) + 1)
+            # MIVAT_term *= max(0, (self.EST_t - self.v))
+            MIVAT_term = self.G_n * max(0, (self.EST_t - self.v)) * (self.t / (self.t - self.TG + 1))
             # If nemesis wouldn't expect to take all of our value in remaining turns, attempt to exploit
-            if self.k >= (self.T - self.t + 1) * self.exploitability:
+            if self.exploitability <= self.k + MIVAT_term:
                 self.strategy = self.best_response
                 self.exploit = True
+                
+                if self.exploitability > self.k:
+                    # MIVAT refund
+                    self.k += self.exploitability
+                    self.num_mivat_exploits += 1
             else:
                 # Pick best equilibrium strategy
                 self.strategy = self.best_equilibrium

@@ -29,6 +29,9 @@ class BE_player:
 
         # How many rounds to play before calculating strategies
         self.interval = 25
+
+        # For integration
+        self.exploit = False
     
     def give_card(self, card: Card):
         self.card = card

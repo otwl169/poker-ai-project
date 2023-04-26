@@ -5,11 +5,16 @@ from Opponents.RandomPlayer import RandomPlayer
 from Opponents.OptimalPlayer import OptimalPlayer
 from Opponents.StrategyPlayer import StrategyPlayer
 from Opponents.SophisticatedPlayer import SophisticatedPlayer
+from Opponents.DynamicPlayer import DynamicPlayer
+
+
+from Algorithms.Pure_Best_Response import BR_Player
 from Algorithms.BEFFE import BEFFE_Player
 from Algorithms.BEFEWP import BEFEWP_Player
-from Algorithms.MBEFFE import BEFFE_MIVAT_Player
-from Algorithms.BEFEWP_MIVAT import BEFEWP_MIVAT_Player
-from Algorithms.GREEDY_MIVAT import GREEDY_MIVAT_Player
+from Algorithms.MBEFFE import MBEFFE_Player
+from Algorithms.MBEFEWP import MBEFEWP_Player
+# from Algorithms.BEFEWP_MIVAT import BEFEWP_MIVAT_Player
+
 
 from MIVAT.MIVAT import MIVAT
 from LinearProgram import *
@@ -29,14 +34,16 @@ so_s = {1: {'K': {'B': 0.8, 'P': 0.2}, 'Q': {'B': 1/3 + 0.2, 'P': 2/3 - 0.2}, 'J
 
 
 # Load pretrained MIVAT weights
-with open("Results/6D_eq_eq_mivat_theta", "rb") as f:
+with open("MIVAT/6D_eq_eq_mivat_theta", "rb") as f:
     theta = pickle.load(f)
 
 est = MIVAT(theta)
 
+
 number_of_hands = 1_000
-g = Kuhn(BEFFE_Player(number_of_hands), SophisticatedPlayer())
-# g = Kuhn(OptimalPlayer(), OptimalPlayer())
+g = Kuhn(MBEFEWP_Player(1000, est), SophisticatedPlayer())
+
+
 t1 = time.time()
 for i in range(number_of_hands):
     # Different values of alpha are optimal against random classes of player (non-exploitative)
@@ -44,6 +51,7 @@ for i in range(number_of_hands):
     # est.observe_trial(payoff, terminal_history)
 
 t2 = time.time()
+print(g.player1.num_mivat_exploits)
 print(f"Winrate in $/hand of player 1: {(g.player1_value) / number_of_hands}")
 # print(f"Player 2 computed strategy: {g.player2_model.calculate_strategy()}")
 # print(f"Estimated winrate using MIVAT: {est.get_average_estimate()}")

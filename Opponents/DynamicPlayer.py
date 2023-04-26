@@ -17,10 +17,22 @@ class DynamicPlayer:
                                 'P': {'K': {'B': 0.5, 'P': 0.5},
                                       'Q': {'B': 0.5, 'P': 0.5},
                                       'J': {'B': 0.5, 'P': 0.5}}}
-        self.best_response = 0
 
-        # Opponent strategy given to DynamicPlayer
-        self.opponent_strategy = 0
+        self.best_response_eq = {'B': {'K': {'B': 1, 'P': 0}, 
+                                       'Q': {'B': 1/3, 'P': 2/3}, 
+                                       'J': {'B': 0, 'P': 1}}, 
+                                 'P': {'K': {'B': 1, 'P': 0}, 
+                                       'Q': {'B': 0, 'P': 1}, 
+                                       'J': {'B': 1/3, 'P': 2/3}}}
+        self.best_response_br = 0
+
+        # Opponent strategy given to DynamicPlayer, store both the equilibrium strategy and the 
+        # best response strategy
+        self.opponent_eq_strategy = 0
+        self.opponent_br_strategy = 0
+
+        # Set to true when the opponent chooses to play a best response
+        self.opponent_exploiting = False
 
         # Round number
         self.t = 0
@@ -65,13 +77,26 @@ class DynamicPlayer:
             self.strategy = self.random_strategy
         else:
             if self.t % self.interval == 1:
-                self.best_response = self.s.get_player2_best_response(self.opponent_strategy)
-        
-            self.strategy = self.best_response
+                # Calculates its own best response to new calculation from opponent directly after they calculate their strategy
+                if self.opponent_br_strategy != 0:
+                    self.best_response_br = self.s.get_player2_best_response(self.opponent_br_strategy)
+
+            if self.opponent_exploiting:
+                if self.best_response_br == 0:
+                    self.best_response_br = self.s.get_player2_best_response(self.opponent_br_strategy)
+                self.strategy = self.best_response_br
+            else:
+                self.strategy = self.best_response_eq
     
         return self.play_strategy(history)
             
     
-    def give_strategy(self, p1_strategy):
-        self.opponent_strategy = p1_strategy
+    def give_strategy(self, p1_strategy, p1_exploit):
+        if p1_exploit:
+            self.opponent_br_strategy = p1_strategy
+            self.opponent_exploiting = True
+        else:
+            self.opponent_eq_strategy = p1_strategy
+            self.opponent_exploiting = False
+            
 

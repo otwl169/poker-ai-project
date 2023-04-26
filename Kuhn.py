@@ -17,7 +17,7 @@ class Action(Enum):
     Fold = "P"
 
 class Kuhn:
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, dynamic=False):
         self.player1 = player1
         self.player2 = player2
         self.player1_value = 0
@@ -29,7 +29,9 @@ class Kuhn:
                                [Card.J, Card.Q]]
         self.card_text = {Card.K: 'K', Card.Q: 'Q', Card.J: 'J'}
         self.t = 0
-        # random.seed(10)
+
+        # For dynamic opponents
+        self.dynamic = dynamic
 
     def deal_cards(self):
         # Uniformly deal cards to each player
@@ -43,13 +45,14 @@ class Kuhn:
         # Play one round of Kuhn poker
         self.t += 1
         cards = self.deal_cards()
-
-        # Specifically for dynamic opponent, give player 1 exact strategy used in round
-        # self.player2.give_strategy(self.player1.strategy) 
     
         # Get actions of both players
         action1: Action = self.player1.play([])
+
+        # Specifically for dynamic opponent, give player 1 exact strategy used in round
+        if self.dynamic: self.player2.give_strategy(self.player1.strategy, self.player1.exploit) 
         action2: Action = self.player2.play([action1])
+
         history: list(Action) = [action1, action2]
 
         # Ensure action sets are legal
@@ -61,6 +64,7 @@ class Kuhn:
         if self.get_legal_moves([action1, action2]):
             action3: Action = self.player1.play([action1, action2])
             history.append(action3)
+        
         
         # Get payoff of terminal history
         payoff = self.get_history_outcome(history, cards)
@@ -156,8 +160,6 @@ class Kuhn:
         elif terminal_history == [Action.Check, Action.Bet, Action.Call]:
             return 2 if cards[0] > cards[1] else -2
         else:
-            # print("Error, not a valid history: ")
-            # print(terminal_history)
             return 0
         
     def get_payoff(self, player1_pure_strategy: str, player2_pure_strategy: str):

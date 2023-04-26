@@ -8,7 +8,7 @@ import pickle
 g = Kuhn(OptimalPlayer(), OptimalPlayer())
 est = MIVAT()
 
-number_of_hands = 1000000
+number_of_hands = 10_000_000
 for i in range(number_of_hands):
     # Different values of alpha are optimal against random classes of player (non-exploitative)
     g.player1 = OptimalPlayer(i / number_of_hands)

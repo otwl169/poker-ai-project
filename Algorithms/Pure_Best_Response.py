@@ -28,7 +28,8 @@ class BR_Player:
         self.interval = 50
 
         # Best response strategy
-        self.best_response = 0
+        self.strategy = 0
+        self.exploit = True
 
         # Translate cards to strings
         self.card_text = {Card.K: "K", Card.Q: "Q", Card.J: "J"}
@@ -47,16 +48,20 @@ class BR_Player:
 
         # Update k
         self.k += 1
+
+        # Update t
+        self.t += 1
+
     
     def play_strategy(self, history: list(Action)):
         ### Play according to a behavioural strategy
         if history == []:
             # Round 1 strategy
-            bet_chance = self.best_response[1][self.card_text[self.card]]['B']
+            bet_chance = self.strategy[1][self.card_text[self.card]]['B']
             return Action.Bet if random.random() < bet_chance else Action.Check
         else:
             # Round 2 strategy
-            bet_chance = self.best_response[2][self.card_text[self.card]]['B']
+            bet_chance = self.strategy[2][self.card_text[self.card]]['B']
             return Action.Call if random.random() < bet_chance else Action.Fold
         
     def play(self, history: list(Action)):
@@ -66,7 +71,8 @@ class BR_Player:
             # Only update the strategy at the start of the turn
             if self.t % self.interval == 0:
                 opponent_strategy = self.M.calculate_strategy()
-                self.best_response = self.s.get_player1_best_response(opponent_strategy)
+                self.strategy = self.s.get_player1_best_response(opponent_strategy)
+        
         
         return self.play_strategy(history)
 

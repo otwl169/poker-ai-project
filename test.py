@@ -8,6 +8,7 @@ from Algorithms.BEFEWP import BEFEWP_Player
 from Algorithms.MBEFEWP import MBEFEWP_Player
 
 from Algorithms.Best_Equilibrium import BE_player
+from Algorithms.Pure_Best_Response import BR_Player
 
 # Import opponent classes
 from Opponents.OptimalPlayer import OptimalPlayer
@@ -53,6 +54,8 @@ class Test:
             p1 = MBEFEWP_Player(self.number_of_hands, self.estimator)
         elif algorithm == "BE":
             p1 = BE_player()
+        elif algorithm == "PBR":
+            p1 = BR_Player()
         else:
             print("Algorithm must be one of five types")
             exit(1)
@@ -74,7 +77,7 @@ class Test:
         return Kuhn(p1, p2, dynamic)
 
     def set_results_file(self, algorithm, opponent):
-        assert algorithm in ["BEFFE", "MBEFFE", "BE", "BEFEWP", "MBEFEWP"]
+        assert algorithm in ["BEFFE", "MBEFFE", "BE", "BEFEWP", "MBEFEWP", "PBR"]
         assert opponent in ["random", "sophisticated", "dynamic", "equilibrium"]
 
         if not self.preliminary:
@@ -115,10 +118,10 @@ class Test:
 
 
 if __name__ == "__main__":
-    Tester = Test(preliminary=True)
+    Tester = Test(preliminary=False)
 
     # Tester.run_test("BEFFE", "random")
-    Tester.run_test("BEFFE", "sophisticated")
+    # Tester.run_test("BEFFE", "sophisticated")
     # Tester.run_test("BEFFE", "dynamic")
     # Tester.run_test("BEFFE", "equilibrium")
 
@@ -132,12 +135,17 @@ if __name__ == "__main__":
     # Tester.run_test("BE", "dynamic")
     # Tester.run_test("BE", "equilibrium")
 
+    # Tester.run_test("PBR", "random")
+    # Tester.run_test("PBR", "sophisticated")
+    Tester.run_test("PBR", "dynamic")
+    # Tester.run_test("PBR", "equilibrium")
+
     # Tester.run_test("BEFEWP", "random")
     # Tester.run_test("BEFEWP", "sophisticated")
     # Tester.run_test("BEFEWP", "dynamic")
     # Tester.run_test("BEFEWP", "equilibrium")
 
-    # Tester.run_test("MBEFEWP", "random")
-    # Tester.run_test("MBEFEWP", "sophisticated")
-    # Tester.run_test("MBEFEWP", "dynamic")
+    Tester.run_test("MBEFEWP", "random")
+    Tester.run_test("MBEFEWP", "sophisticated")
+    Tester.run_test("MBEFEWP", "dynamic")
     # Tester.run_test("MBEFEWP", "equilibrium")

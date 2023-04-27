@@ -18,7 +18,7 @@ class SophisticatedPlayer:
                                'J': {'B': 1/3, 'P': 2/3}}}
 
         # Set strategy to within 0.2 of equilibrium, decided by a uniform distribution
-        self.modify_strategy2()
+        self.modify_strategy()
 
         # Card text map
         self.card_text = {Card.K: 'K', Card.Q: 'Q', Card.J: 'J'}

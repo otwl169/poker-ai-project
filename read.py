@@ -37,7 +37,7 @@ class Read:
 
 if __name__ == "__main__":
     Reader = Read(preliminary=False)
-    Reader.NUM_LINES = 10_000
+    Reader.NUM_LINES = 20_000
     # Reader.read_file("Preliminary Results/BEFFE_random_10k")
     # Reader.read_file("Preliminary Results/BEFFE_sophisticated_10k")
     # Reader.read_file("Preliminary Results/BEFFE_dynamic_10k")
@@ -50,9 +50,9 @@ if __name__ == "__main__":
     # Reader.read_file("Preliminary Results/BEFEWP_sophisticated_10k")
     # Reader.read_file("Preliminary Results/BEFEWP_dynamic_10k")
 
-    Reader.read_file("Preliminary Results/MBEFEWP_random_10k")
-    Reader.read_file("Preliminary Results/MBEFEWP_sophisticated_10k")
-    Reader.read_file("Preliminary Results/MBEFEWP_dynamic_10k")
+    # Reader.read_file("Preliminary Results/MBEFEWP_random_10k")
+    # Reader.read_file("Preliminary Results/MBEFEWP_sophisticated_10k")
+    # Reader.read_file("Preliminary Results/MBEFEWP_dynamic_10k")
 
 
 
@@ -60,5 +60,9 @@ if __name__ == "__main__":
 
     # Reader.read_algorithm_data("BEFFE")
 
-    # Reader.read_algorithm_data("BEFEWP")
+    Reader.read_algorithm_data("BEFEWP")
+
+    Reader.read_algorithm_data("MBEFEWP")
+
+    Reader.read_algorithm_data("PBR")
     

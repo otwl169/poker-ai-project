@@ -58,11 +58,13 @@ if __name__ == "__main__":
 
     # Reader.read_algorithm_data("BE")
 
-    # Reader.read_algorithm_data("BEFFE")
+    Reader.read_algorithm_data("BEFFE")
 
-    Reader.read_algorithm_data("BEFEWP")
+    Reader.read_algorithm_data("MBEFFE")
 
-    Reader.read_algorithm_data("MBEFEWP")
+    # Reader.read_algorithm_data("BEFEWP")
+
+    # Reader.read_algorithm_data("MBEFEWP")
 
     Reader.read_algorithm_data("PBR")
     

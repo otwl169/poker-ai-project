@@ -125,9 +125,9 @@ if __name__ == "__main__":
     # Tester.run_test("BEFFE", "dynamic")
     # Tester.run_test("BEFFE", "equilibrium")
 
-    # Tester.run_test("MBEFFE", "random")
-    # Tester.run_test("MBEFFE", "sophisticated")
-    # Tester.run_test("MBEFFE", "dynamic")
+    Tester.run_test("MBEFFE", "random")
+    Tester.run_test("MBEFFE", "sophisticated")
+    Tester.run_test("MBEFFE", "dynamic")
     # Tester.run_test("MBEFFE", "equilibrium")
 
     # Tester.run_test("BE", "random")
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     # Tester.run_test("PBR", "random")
     # Tester.run_test("PBR", "sophisticated")
-    Tester.run_test("PBR", "dynamic")
+    # Tester.run_test("PBR", "dynamic")
     # Tester.run_test("PBR", "equilibrium")
 
     # Tester.run_test("BEFEWP", "random")
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     # Tester.run_test("BEFEWP", "dynamic")
     # Tester.run_test("BEFEWP", "equilibrium")
 
-    Tester.run_test("MBEFEWP", "random")
-    Tester.run_test("MBEFEWP", "sophisticated")
-    Tester.run_test("MBEFEWP", "dynamic")
+    # Tester.run_test("MBEFEWP", "random")
+    # Tester.run_test("MBEFEWP", "sophisticated")
+    # Tester.run_test("MBEFEWP", "dynamic")
     # Tester.run_test("MBEFEWP", "equilibrium")

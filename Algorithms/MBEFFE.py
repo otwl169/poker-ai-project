@@ -153,14 +153,14 @@ class MBEFFE_Player:
             MIVAT_term = self.G_n * max(0, (self.EST_t - self.v)) * (self.t / (self.t - self.TG + 1))
             # print(MIVAT_term)
             # If nemesis wouldn't expect to take all of our value in remaining turns, attempt to exploit
-            if self.k + MIVAT_term >= (self.T - self.t + 1) * self.exploitability:
+            if self.k + MIVAT_term >= self.interval * self.exploitability:
                 # print(f"Exploiting at {self.t=}")
                 self.strategy = self.best_response
                 self.exploit = True
 
-                if self.k < (self.T - self.t + 1) * self.exploitability:
+                if self.k < 50 * self.exploitability:
                     # MIVAT exploit refund
-                    self.k += self.exploitability
+                    self.k += max(0, (self.EST_t - self.v))
             else:
                 # Pick best equilibrium strategy
                 self.strategy = self.best_equilibrium
